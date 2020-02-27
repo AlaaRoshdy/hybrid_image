@@ -6,6 +6,7 @@ import numpy as np
 from numpy import pi, exp, sqrt
 from skimage import io, img_as_ubyte, img_as_float32
 from skimage.transform import rescale
+from scipy.signal import gaussian
 
 def my_imfilter(image: np.ndarray, filter: np.ndarray):
   """
@@ -56,7 +57,8 @@ def gen_hybrid_image(image1: np.ndarray, image2: np.ndarray, cutoff_frequency: f
   #     blur that works best will vary with different image pairs
   # generate a gaussian kernel with mean=0 and sigma = cutoff_frequency,
   # Just a heads up but think how you can generate 2D gaussian kernel from 1D gaussian kernel
-  ksize = (3,3)  
+  ksize = (19,19)  
+  cutoff_frequency = 500
   kernel = create_gaussian_filter(ksize,cutoff_frequency)
   
   # Your code here:
@@ -66,11 +68,15 @@ def gen_hybrid_image(image1: np.ndarray, image2: np.ndarray, cutoff_frequency: f
   #     subtract a blurred version of image2 from the original version of image2.
   #     This will give you an image centered at zero with negative values.
   # Your code here #
-  high_frequencies = image2 - my_imfilter(image2,kernel) # Replace with your implementation
+  cutoff_frequency = 1000
+  kernel = create_gaussian_filter(ksize,cutoff_frequency)
+  high = image2 - my_imfilter(image2,kernel)  
+  #when visualizing, make sure you use np.uint8()
+  high_frequencies = (high+128.0)%255 # Replace with your implementation
 
   # (3) Combine the high frequencies and low frequencies
   # Your code here #
-  hybrid_image = None # Replace with your implementation
+  hybrid_image = np.clip((high_frequencies+low_frequencies-128),0,255) # Replace with your implementation
 
   # (4) At this point, you need to be aware that values larger than 1.0
   # or less than 0.0 may cause issues in the functions in Python for saving
