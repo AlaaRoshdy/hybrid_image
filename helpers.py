@@ -20,14 +20,27 @@ def my_imfilter(image: np.ndarray, filter: np.ndarray):
       Errors if:
       - filter has any even dimension -> raise an Exception with a suitable error message.
   """
-  filtered_image = np.asarray([0])
+  # filtered_image = np.asarray([0])
+  filter = np.flip(np.flip(filter,0),1)
+  assert len(filter.shape) ==2," Filter must have shape (k,l)"
+  assert filter.shape[0]%2 ==1, "filter dimensions have to be odd"
+  assert filter.shape[1]%2 ==1, "filter dimensions have to be odd"
+  new_shape = list(image.shape)
+  r_pad, c_pad = ((filter.shape[0] - 1)//2 , (filter.shape[1] - 1)//2) #row and column padding
+  new_shape[0] += r_pad*2
+  new_shape[1] += c_pad*2
+  new_image = np.zeros(new_shape)
+  new_image[r_pad:r_pad+image.shape[0], c_pad:c_pad+image.shape[1]] = image
+  if len(new_shape) ==2: new_image = np.expand_dims(new_image,2)
 
-  ##################
-  # Your code here #
-  raise NotImplementedError('my_imfilter function in helpers.py needs to be implemented')
-  ##################
+  convolver = np.vectorize(lambda i,j,k: np.sum(filter*new_image[i:i+filter.shape[0],
+                                                                 j:j+filter.shape[1],k]))
 
-  return filtered_image
+  filtered_image = convolver(np.asarray(range(0,image.shape[0])).reshape(-1,1,1), # is
+                             np.asarray(range(0,image.shape[1])).reshape(1,-1,1), # js
+                             np.asarray(range(0,new_image.shape[2])).reshape(1,1,-1)) #ks
+
+  return filtered_image.squeeze().astype(np.uint8)
 
 def create_gaussian_filter(ksize, sigma):
     # create gaussian filter of an arbitrary MxN dimensions
