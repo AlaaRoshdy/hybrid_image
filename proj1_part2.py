@@ -40,14 +40,14 @@ low_frequencies, high_frequencies, hybrid_image = gen_hybrid_image(image1, image
 
 ## Visualize and save outputs ##
 plt.figure()
-plt.imshow((low_frequencies).astype(np.uint8))
+plt.imshow((low_frequencies*255).astype(np.uint8))
 plt.figure()
-plt.imshow(((high_frequencies)).astype(np.uint8))
+plt.imshow(((high_frequencies+0.5)*255).astype(np.uint8))
 vis = vis_hybrid_image(hybrid_image)
 plt.figure(figsize=(20, 20))
 plt.imshow(vis)
 
 save_image('../results/low_frequencies.jpg', low_frequencies)
-save_image('../results/high_frequencies.jpg', (high_frequencies+0.5)%1)
+save_image('../results/high_frequencies.jpg', np.clip((high_frequencies+0.5),0,1))
 save_image('../results/hybrid_image.jpg', hybrid_image)
 save_image('../results/hybrid_image_scales.jpg', vis)
