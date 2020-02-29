@@ -50,13 +50,6 @@ def create_gaussian_filter(ksize, sigma):
     # Normalize the kernel values
     return (kernel2D)/(np.sum(kernel2D))
 
-# lets leave that here for now til the actual imfilter is implemented
-def im(img,kernel):
-    filtered_image = np.array(img)
-    filtered_image[:,:,0] = correlate2d(img[:,:,0], kernel, 'same')
-    filtered_image[:,:,1] = correlate2d(img[:,:,1], kernel, 'same')
-    filtered_image[:,:,2] = correlate2d(img[:,:,2], kernel, 'same')
-    return filtered_image
 
 def gen_hybrid_image(image1: np.ndarray, image2: np.ndarray, cutoff_frequency: float):
   """
@@ -73,11 +66,6 @@ def gen_hybrid_image(image1: np.ndarray, image2: np.ndarray, cutoff_frequency: f
 
   assert image1.shape == image2.shape
 
-  # Steps:
-  # (1) Remove the high frequencies from image1 by blurring it. The amount of
-  #     blur that works best will vary with different image pairs
-  # generate a gaussian kernel with mean=0 and sigma = cutoff_frequency,
-  # Just a heads up but think how you can generate 2D gaussian kernel from 1D gaussian kernel
   ksize = (19,19)  
   kernel_low = create_gaussian_filter(ksize,cutoff_frequency)
   kernel_high = create_gaussian_filter(ksize,cutoff_frequency*2)
