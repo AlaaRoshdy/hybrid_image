@@ -6,8 +6,9 @@ import numpy as np
 from numpy import pi, exp, sqrt
 from skimage import io, img_as_ubyte, img_as_float32
 from skimage.transform import rescale
-from scipy.signal import gaussian
 # import matplotlib.pyplot as plt
+from scipy.signal import gaussian, correlate2d
+
 def my_imfilter(image: np.ndarray, filter: np.ndarray):
   """
       Your function should meet the requirements laid out on the project webpage.
@@ -64,12 +65,6 @@ def create_gaussian_filter(ksize, sigma):
     # Normalize the kernel values
     return (kernel2D)/(np.sum(kernel2D))
 
-# lets leave that here for now til the actual imfilter is implemented
-def im(img,kernel):
-    my_blur[:,:,0] = correlate2d(img[:,:,0], kernel, 'same')
-    my_blur[:,:,1] = correlate2d(img[:,:,1], kernel, 'same')
-    my_blur[:,:,2] = correlate2d(img[:,:,2], kernel, 'same')
-    return filtered_image
 
 def gen_hybrid_image(image1: np.ndarray, image2: np.ndarray, cutoff_frequency: float):
   """
@@ -86,39 +81,14 @@ def gen_hybrid_image(image1: np.ndarray, image2: np.ndarray, cutoff_frequency: f
 
   assert image1.shape == image2.shape
 
-  # Steps:
-  # (1) Remove the high frequencies from image1 by blurring it. The amount of
-  #     blur that works best will vary with different image pairs
-  # generate a gaussian kernel with mean=0 and sigma = cutoff_frequency,
-  # Just a heads up but think how you can generate 2D gaussian kernel from 1D gaussian kernel
   ksize = (19,19)  
-  kernel = create_gaussian_filter(ksize,cutoff_frequency)
+  kernel_low = create_gaussian_filter(ksize,cutoff_frequency)
+  kernel_high = create_gaussian_filter(ksize,cutoff_frequency*2)
   
-  # Your code here:
-  #low_frequencies = my_imfilter(image1,kernel) # Replace with your implementation
-  low_frequencies = im(image1,kernel) 
-  # (2) Remove the low frequencies from image2. The easiest way to do this is to
-  #     subtract a blurred version of image2 from the original version of image2.
-  #     This will give you an image centered at zero with negative values.
-  # Your code here #
-  kernel = create_gaussian_filter(ksize,cutoff_frequency*2)
-  high = image2 - my_imfilter(image2,kernel)  
-  #when visualizing, make sure you use np.uint8()
-  high_frequencies = (high+128.0)%255 # Replace with your implementation
-
-  # (3) Combine the high frequencies and low frequencies
-  # Your code here #
-  hybrid_image = np.clip((high_frequencies+low_frequencies-128),0,255) # Replace with your implementation
-
-  # (4) At this point, you need to be aware that values larger than 1.0
-  # or less than 0.0 may cause issues in the functions in Python for saving
-  # images to disk. These are called in proj1_part2 after the call to 
-  # gen_hybrid_image().
-  # One option is to clip (also called clamp) all values below 0.0 to 0.0, 
-  # and all values larger than 1.0 to 1.0.
-  # (5) As a good software development practice you may add some checks (assertions) for the shapes
-  # and ranges of your results. This can be performed as test for the code during development or even
-  # at production!
+  low_frequencies = my_imfilter(image1,kernel_low) 
+  high_frequencies = image2 - my_imfilter(image2,kernel_high) 
+  
+  hybrid_image = np.clip((high_frequencies+low_frequencies),0,1) 
 
   return low_frequencies, high_frequencies, hybrid_image
 
@@ -140,7 +110,7 @@ def vis_hybrid_image(hybrid_image: np.ndarray):
     output = np.hstack((output, np.ones((original_height, padding, num_colors),
                                         dtype=np.float32)))
     # downsample image
-    cur_image = rescale(cur_image, scale_factor, mode='reflect')
+    cur_image = rescale(cur_image, scale_factor, mode='reflect', multichannel = True)
     # pad the top to append to the output
     pad = np.ones((original_height-cur_image.shape[0], cur_image.shape[1],
                    num_colors), dtype=np.float32)
