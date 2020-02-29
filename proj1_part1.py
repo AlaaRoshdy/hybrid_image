@@ -23,7 +23,7 @@ This filter should do nothing regardless of the padding method you use.
 identity_filter = np.asarray([[0, 0, 0], [0, 1, 0], [0, 0, 0]], dtype=np.float32)
 identity_image = my_imfilter(test_image, identity_filter)
 plt.imshow(identity_image)
-plt.show()
+# plt.show()
 done = save_image('../results/identity_image.jpg', identity_image)
 
 
@@ -35,7 +35,7 @@ blur_filter = np.ones((3, 3), dtype=np.float32)
 blur_filter /= np.sum(blur_filter, dtype=np.float32)  # making the filter sum to 1
 blur_image = my_imfilter(test_image, blur_filter)
 plt.imshow(blur_image)
-plt.show()
+# plt.show()
 done = save_image(resultsDir + os.sep + 'blur_image.jpg', blur_image)
 
 
@@ -66,7 +66,7 @@ sobel_image = my_imfilter(test_image, sobel_filter)
 # 0.5 added because the output image is centered around zero otherwise and mostly black
 sobel_image = np.clip(sobel_image+0.5, 0.0, 1.0)
 plt.imshow(sobel_image)
-plt.show()
+# plt.show()
 done = save_image(resultsDir + os.sep + 'sobel_image.jpg', sobel_image)
 
 
@@ -79,12 +79,12 @@ laplacian_image = my_imfilter(test_image, laplacian_filter)
 # added because the output image is centered around zero otherwise and mostly black
 laplacian_image = np.clip(laplacian_image+0.5, 0.0, 1.0)
 plt.figure(); plt.imshow(laplacian_image)
-plt.show()
+# plt.show()
 done = save_image(resultsDir + os.sep + 'laplacian_image.jpg', laplacian_image)
 
 # High pass "filter" alternative
 high_pass_image = test_image - blur_image
 high_pass_image = np.clip(high_pass_image+0.5, 0.0, 1.0)
 plt.figure(); plt.imshow(high_pass_image)
-plt.show()
+# plt.show()
 done = save_image(resultsDir + os.sep + 'high_pass_image.jpg', high_pass_image)

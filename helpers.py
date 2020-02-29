@@ -7,7 +7,7 @@ from numpy import pi, exp, sqrt
 from skimage import io, img_as_ubyte, img_as_float32
 from skimage.transform import rescale
 from scipy.signal import gaussian
-
+# import matplotlib.pyplot as plt
 def my_imfilter(image: np.ndarray, filter: np.ndarray):
   """
       Your function should meet the requirements laid out on the project webpage.
@@ -29,8 +29,22 @@ def my_imfilter(image: np.ndarray, filter: np.ndarray):
   r_pad, c_pad = ((filter.shape[0] - 1)//2 , (filter.shape[1] - 1)//2) #row and column padding
   new_shape[0] += r_pad*2
   new_shape[1] += c_pad*2
-  new_image = np.zeros(new_shape)
+  new_image = np.zeros(new_shape, dtype=image.dtype)
   new_image[r_pad:r_pad+image.shape[0], c_pad:c_pad+image.shape[1]] = image
+  # pad with reflected image
+  # horizontal up and down strips:
+  new_image[:r_pad,c_pad:c_pad+image.shape[1]] = image[:r_pad,:][::-1,:] # upper h strip
+  new_image[-r_pad:,c_pad:c_pad+image.shape[1]] = image[-r_pad:,:][::-1,:] # lower h strip
+  # vertical up and down strips:
+  new_image[r_pad:r_pad+image.shape[0],:c_pad] = image[:,:c_pad][:,::-1] # left v strip
+  new_image[r_pad:r_pad+image.shape[0],-c_pad:] = image[:,-c_pad:][:,::-1] # right v strip
+  # corners: by flipping the already flipped edges from previous step.
+  new_image[:r_pad, :c_pad] = new_image[:r_pad, c_pad:2*c_pad][:,::-1] # top left
+  new_image[:r_pad, -c_pad:] = new_image[:r_pad, -2*c_pad:-c_pad][:,::-1] # top right
+  new_image[-r_pad:, :c_pad] = new_image[-r_pad:, c_pad:2*c_pad][:,::-1] # bottom left
+  new_image[-r_pad:, -c_pad:] = new_image[-r_pad:, -2*c_pad:-c_pad][:,::-1] # bottom right
+  # plt.imshow(new_image)
+  # plt.show()
   if len(new_shape) ==2: new_image = np.expand_dims(new_image,2)
 
   convolver = np.vectorize(lambda i,j,k: np.sum(filter*new_image[i:i+filter.shape[0],
@@ -40,7 +54,7 @@ def my_imfilter(image: np.ndarray, filter: np.ndarray):
                              np.asarray(range(0,image.shape[1])).reshape(1,-1,1), # js
                              np.asarray(range(0,new_image.shape[2])).reshape(1,1,-1)) #ks
 
-  return filtered_image.squeeze().astype(image.dtype)
+  return filtered_image.squeeze()
 
 def create_gaussian_filter(ksize, sigma):
     # create gaussian filter of an arbitrary MxN dimensions
