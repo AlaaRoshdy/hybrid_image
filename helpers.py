@@ -40,7 +40,7 @@ def my_imfilter(image: np.ndarray, filter: np.ndarray):
                              np.asarray(range(0,image.shape[1])).reshape(1,-1,1), # js
                              np.asarray(range(0,new_image.shape[2])).reshape(1,1,-1)) #ks
 
-  return filtered_image.squeeze().astype(np.uint8)
+  return filtered_image.squeeze().astype(image.dtype)
 
 def create_gaussian_filter(ksize, sigma):
     # create gaussian filter of an arbitrary MxN dimensions
