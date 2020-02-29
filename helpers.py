@@ -82,6 +82,10 @@ def gen_hybrid_image(image1: np.ndarray, image2: np.ndarray, cutoff_frequency: f
   assert image1.shape == image2.shape
 
   ksize = (19,19)  
+  if ksize[0]%2 == 0 or ksize[1]%2 == 0:
+    print("the kernel size cannot be even")
+    pass
+  
   kernel_low = create_gaussian_filter(ksize,cutoff_frequency)
   kernel_high = create_gaussian_filter(ksize,cutoff_frequency*2)
   
