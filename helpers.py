@@ -66,13 +66,14 @@ def create_gaussian_filter(ksize, sigma):
     return (kernel2D)/(np.sum(kernel2D))
 
 
-def gen_hybrid_image(image1: np.ndarray, image2: np.ndarray, cutoff_frequency: float):
+def gen_hybrid_image(image1: np.ndarray, image2: np.ndarray, cutoff_frequency: float, ksize):
   """
    Inputs:
    - image1 -> The image from which to take the low frequencies.
    - image2 -> The image from which to take the high frequencies.
    - cutoff_frequency -> The standard deviation, in pixels, of the Gaussian
                          blur that will remove high frequencies.
+   -ksize -> tuple containing the kernel size
 
    Task:
    - Use my_imfilter to create 'low_frequencies' and 'high_frequencies'.
@@ -81,7 +82,6 @@ def gen_hybrid_image(image1: np.ndarray, image2: np.ndarray, cutoff_frequency: f
 
   assert image1.shape == image2.shape
 
-  ksize = (19,19)  
   if ksize[0]%2 == 0 or ksize[1]%2 == 0:
     print("the kernel size cannot be even")
     pass

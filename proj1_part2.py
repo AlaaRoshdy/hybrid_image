@@ -36,7 +36,8 @@ plt.imshow((image2*255).astype(np.uint8))
 # blur that will remove high frequencies. You may tune this per image pair
 # to achieve better results.
 cutoff_frequency = 500
-low_frequencies, high_frequencies, hybrid_image = gen_hybrid_image(image1, image2, cutoff_frequency)
+ksize = (19,19)  
+low_frequencies, high_frequencies, hybrid_image = gen_hybrid_image(image1, image2, cutoff_frequency, ksize)
 
 ## Visualize and save outputs ##
 plt.figure()
